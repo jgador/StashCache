@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\StashCache\StashCache.csproj" />
+    <PackageReference Include="StashCache" Version="1.0.0" />
   </ItemGroup>
 
 </Project>
