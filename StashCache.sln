@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31612.314
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StashCache", "src\StashCache\StashCache.csproj", "{3E9FAA63-9B8C-4467-8C4B-F41106A2B970}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample.AspNetCore", "src\Sample.AspNetCore\Sample.AspNetCore.csproj", "{63B70F97-7359-45EB-BF1C-C96699E3D13C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3E9FAA63-9B8C-4467-8C4B-F41106A2B970}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E9FAA63-9B8C-4467-8C4B-F41106A2B970}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3E9FAA63-9B8C-4467-8C4B-F41106A2B970}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3E9FAA63-9B8C-4467-8C4B-F41106A2B970}.Release|Any CPU.Build.0 = Release|Any CPU
+		{63B70F97-7359-45EB-BF1C-C96699E3D13C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{63B70F97-7359-45EB-BF1C-C96699E3D13C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{63B70F97-7359-45EB-BF1C-C96699E3D13C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{63B70F97-7359-45EB-BF1C-C96699E3D13C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {150EAF2A-061A-4E9D-BED6-4A8DB2287137}
+	EndGlobalSection
+EndGlobal
