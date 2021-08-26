@@ -1,5 +1,6 @@
 # StashCache
 
-**StashCache** is a caching library to get you off the ground with your ASP.NET Core Web application fairly easy with fewer lines of code.
+**StashCache** is a in-memory caching library for your .NET application. Under the hood, it uses the `IMemoryCache` from `Microsoft.Extensions.Caching.Memory`.
 
-Under the hood, StashCache uses the `IMemoryCache` from `Microsoft.Extensions.Caching.Memory`.
+## Get Started ##
+While I put together a proper documentation, a sample ASP.NET Core project can already help you to get started.
