@@ -24,7 +24,7 @@ namespace StashCache
             return value;
         }
 
-        public static string NotEmpty(this string value, string paramName)
+        public static string NotEmpty(this string? value, string paramName)
         {
             if (string.IsNullOrWhiteSpace(value))
             {
