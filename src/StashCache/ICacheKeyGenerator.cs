@@ -1,9 +1,10 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace StashCache
 {
     public interface ICacheKeyGenerator<TGenerator>
     {
-        CacheKey GenerateCacheKey<TOwner>([CallerMemberName] string? callerMemberName = null, params string[]? segments);
+        CacheKey GenerateCacheKey<TOwner>([CallerMemberName] string? callerMemberName = null, IEnumerable<string>? segments = null);
     }
 }

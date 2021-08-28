@@ -1,60 +1,38 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using StashCache;
-using System;
+using Sample.AspNetCore.Services;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Sample.AspNetCore.Controllers
 {
-	[ApiController]
-	[Route("[controller]")]
-	public class WeatherForecastController : ControllerBase
-	{
-		private static readonly ICacheKeyGenerator<TypeCacheKeyGenerator> CacheKeyGenerator = CacheKeyGeneratorFactory.GetCacheKeyGenerator<TypeCacheKeyGenerator>();
-		private static readonly TimeSpan DefaultCacheExpiry = TimeSpan.FromHours(1);
+    [ApiController]
+    [Route("[controller]")]
+    public class WeatherForecastController : ControllerBase
+    {
+        private readonly WeatherForecastService _weatherService;
 
-		private static readonly string[] Summaries = new[]
-		{
-			"Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-		};
+        public WeatherForecastController(WeatherForecastService weatherService)
+        {
+            _weatherService = weatherService; ;
+        }
 
-		private readonly ILogger<WeatherForecastController> _logger;
-		private readonly ILocalCache _localCache;
+        [HttpGet]
+        [Route("")]
+        public async Task<IEnumerable<WeatherForecast>> GetAsync(CancellationToken cancellationToken)
+        {
+            var result = await _weatherService.GetAll(cancellationToken);
 
-		public WeatherForecastController(ILogger<WeatherForecastController> logger, ILocalCache localCache)
-		{
-			_logger = logger;
-			_localCache = localCache;
-		}
+            return result;
+        }
 
-		[HttpGet]
-		public async Task<IEnumerable<WeatherForecast>> GetAsync(CancellationToken cancellationToken)
-		{
-			var cacheKey = CacheKeyGenerator.GenerateCacheKey<WeatherForecastController>();
+        [HttpGet]
+        [Route("{summary}")]
+        public async Task<IEnumerable<WeatherForecast>> GetSummaryAsync([FromRoute] string summary, CancellationToken cancellationToken)
+        {
+            var result = await _weatherService.GetBySummaryAsync(summary, cancellationToken);
 
-			var cachedValues = await _localCache.GetOrAddAsync<IEnumerable<WeatherForecast>>(cacheKey, async() =>
-			{
-				// Mimic awaitable task here (i.e database call)
-				await Task.CompletedTask;
-
-				var random = new Random();
-
-                return Enumerable.Range(1, 5).Select(index => new WeatherForecast
-                {
-                    Date = DateTime.Now.AddDays(index),
-                    TemperatureC = random.Next(-20, 55),
-                    Summary = Summaries[random.Next(Summaries.Length)]
-                })
-                .ToArray();
-
-
-            }, DefaultCacheExpiry, cancellationToken).ConfigureAwait(false);
-
-
-			return cachedValues;
-		}
-	}
+            return result;
+        }
+    }
 }

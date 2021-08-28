@@ -13,7 +13,7 @@ namespace StashCache
         private readonly IEnumerable<string>? _segments;
         private readonly string? _segmentString;
 
-        public CacheKey(Type ownerType, string memberInfo, params string[]? segments)
+        public CacheKey(Type ownerType, string memberInfo, IEnumerable<string>? segments)
         {
             _ownerType = ownerType.NotNull(nameof(ownerType));
             _memberInfo = memberInfo.NotEmpty(nameof(memberInfo));
@@ -22,6 +22,8 @@ namespace StashCache
 
             if (segments != null && segments.Any())
             {
+                segments.ToList().ForEach(segment => segment.NotEmpty(nameof(segment)));
+
                 var sb = new StringBuilder();
 
                 foreach (var segment in segments)
