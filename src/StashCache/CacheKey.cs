@@ -46,7 +46,7 @@ namespace StashCache
 
         public override string ToString()
         {
-            return $"{_ownerType.FullName}.{_memberInfo}:{_segmentString ?? string.Empty}";
+            return $"{_ownerType.FullName}.{_memberInfo}{_segmentString ?? string.Empty}";
         }
     }
 }

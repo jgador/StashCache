@@ -20,7 +20,7 @@ namespace StashCache
             _logger = logger.NotNull(nameof(logger));
         }
 
-        public async Task<TResult> GetOrAddAsync<TResult>(CacheKey cacheKey, Func<CancellationToken, Task<TResult>> valueFactory, TimeSpan timeToLive, CancellationToken cancellationToken)
+        public async Task<TResult> GetOrAddAsync<TResult>(CacheKey cacheKey, Func<Task<TResult>> valueFactory, TimeSpan timeToLive, CancellationToken cancellationToken)
         {
             valueFactory.NotNull(nameof(valueFactory));
 
@@ -31,7 +31,7 @@ namespace StashCache
                 return cachedValue;
             }
 
-            cachedValue = await valueFactory(cancellationToken).ConfigureAwait(false);
+            cachedValue = await valueFactory().ConfigureAwait(false);
 
             if (cachedValue == null)
             {
@@ -50,6 +50,8 @@ namespace StashCache
                     }
                     else
                     {
+                        _logger.LogDebug($"Cache miss: {cacheKey}");
+
                         cachedValue = (TResult)newCacheValue;
 
                         _memoryCache.Set(cacheKey, cachedValue, new MemoryCacheEntryOptions { AbsoluteExpirationRelativeToNow = timeToLive });

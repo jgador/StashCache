@@ -6,6 +6,6 @@ namespace StashCache
 {
     public interface ILocalCache
     {
-        public Task<TResult> GetOrAddAsync<TResult>(CacheKey cacheKey, Func<CancellationToken, Task<TResult>> valueFactory, TimeSpan timeToLive, CancellationToken cancellationToken);
+        public Task<TResult> GetOrAddAsync<TResult>(CacheKey cacheKey, Func<Task<TResult>> valueFactory, TimeSpan timeToLive, CancellationToken cancellationToken);
     }
 }

@@ -4,6 +4,7 @@ using StashCache;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Sample.AspNetCore.Controllers
@@ -12,7 +13,8 @@ namespace Sample.AspNetCore.Controllers
 	[Route("[controller]")]
 	public class WeatherForecastController : ControllerBase
 	{
-		protected static readonly ICacheKeyGenerator<TypeCacheKeyGenerator> CacheKeyGenerator = CacheKeyGeneratorFactory.GetCacheKeyGenerator<TypeCacheKeyGenerator>();
+		private static readonly ICacheKeyGenerator<TypeCacheKeyGenerator> CacheKeyGenerator = CacheKeyGeneratorFactory.GetCacheKeyGenerator<TypeCacheKeyGenerator>();
+		private static readonly TimeSpan DefaultCacheExpiry = TimeSpan.FromHours(1);
 
 		private static readonly string[] Summaries = new[]
 		{
@@ -29,27 +31,28 @@ namespace Sample.AspNetCore.Controllers
 		}
 
 		[HttpGet]
-		public async Task<IEnumerable<WeatherForecast>> GetAsync()
+		public async Task<IEnumerable<WeatherForecast>> GetAsync(CancellationToken cancellationToken)
 		{
 			var cacheKey = CacheKeyGenerator.GenerateCacheKey<WeatherForecastController>();
-			var cacheExpiry = TimeSpan.FromHours(1);
 
-			var cachedValues = await _localCache.GetOrAddAsync(cacheKey, async () =>
+			var cachedValues = await _localCache.GetOrAddAsync<IEnumerable<WeatherForecast>>(cacheKey, async() =>
 			{
-				// Mimic awaitable task here (i.e. database call)
+				// Mimic awaitable task here (i.e database call)
 				await Task.CompletedTask;
 
-				var rng = new Random();
+				var random = new Random();
 
-				return Enumerable.Range(1, 5).Select(index => new WeatherForecast
-				{
-					Date = DateTime.Now.AddDays(index),
-					TemperatureC = rng.Next(-20, 55),
-					Summary = Summaries[rng.Next(Summaries.Length)]
-				})
-				.ToArray();
+                return Enumerable.Range(1, 5).Select(index => new WeatherForecast
+                {
+                    Date = DateTime.Now.AddDays(index),
+                    TemperatureC = random.Next(-20, 55),
+                    Summary = Summaries[random.Next(Summaries.Length)]
+                })
+                .ToArray();
 
-			}, cacheExpiry).ConfigureAwait(false);
+
+            }, DefaultCacheExpiry, cancellationToken).ConfigureAwait(false);
+
 
 			return cachedValues;
 		}
