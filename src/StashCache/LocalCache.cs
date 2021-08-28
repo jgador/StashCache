@@ -3,11 +3,12 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace StashCache
 {
-	public sealed class LocalCache : ILocalCache
+    public sealed class LocalCache : ILocalCache
     {
         private static readonly ConcurrentDictionary<CacheKey, object> _locks = new();
         private readonly IMemoryCache _memoryCache;
@@ -19,7 +20,7 @@ namespace StashCache
             _logger = logger.NotNull(nameof(logger));
         }
 
-        public async Task<TResult> GetOrAddAsync<TResult>(CacheKey cacheKey, Func<Task<TResult>> valueFactory, TimeSpan timeToLive)
+        public async Task<TResult> GetOrAddAsync<TResult>(CacheKey cacheKey, Func<Task<TResult>> valueFactory, TimeSpan timeToLive, CancellationToken cancellationToken)
         {
             valueFactory.NotNull(nameof(valueFactory));
 
@@ -32,11 +33,16 @@ namespace StashCache
 
             cachedValue = await valueFactory().ConfigureAwait(false);
 
-            var acquiredLock = _locks.GetOrAdd(cacheKey, _ => cachedValue);
+            if (cachedValue == null)
+            {
+                throw new NotSupportedException("Does not support caching of null value.");
+            }
+
+            var newCacheValue = _locks.GetOrAdd(cacheKey, cachedValue);
 
             try
             {
-                lock (acquiredLock)
+                lock (newCacheValue)
                 {
                     if (_memoryCache.TryGetValue(cacheKey, out cachedValue))
                     {
@@ -46,7 +52,7 @@ namespace StashCache
                     {
                         _logger.LogDebug($"Cache miss: {cacheKey}");
 
-                        cachedValue = (TResult)acquiredLock;
+                        cachedValue = (TResult)newCacheValue;
 
                         _memoryCache.Set(cacheKey, cachedValue, new MemoryCacheEntryOptions { AbsoluteExpirationRelativeToNow = timeToLive });
                     }

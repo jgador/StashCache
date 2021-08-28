@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
-    <AssemblyVersion>1.0.0</AssemblyVersion>
-    <Version>1.0.0</Version>
+    <AssemblyVersion>1.0.1</AssemblyVersion>
+    <Version>1.0.1</Version>
     <Authors>Jesse Gador</Authors>
     <Company>Jesse Gador</Company>
     <Description>In-memory cache wrapper implementation of Microsoft.Extensions.Caching.Memory.IMemoryCache.</Description>
@@ -13,17 +13,10 @@
     <RepositoryType>git</RepositoryType>
     <PackageTags>Cache;StashCache;MemoryCache</PackageTags>
     <NeutralLanguage>en</NeutralLanguage>
-    <FileVersion>1.0.0</FileVersion>
+    <FileVersion>1.0.1</FileVersion>
     <Nullable>enable</Nullable>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
-
-  <ItemGroup>
-    <None Include="..\..\README.md">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
-    </None>
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="5.0.0" />

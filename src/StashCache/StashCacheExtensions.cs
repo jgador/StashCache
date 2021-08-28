@@ -2,17 +2,17 @@
 
 namespace StashCache
 {
-	public static class StashCacheExtensions
-	{
-		public static IServiceCollection AddStashCache(this IServiceCollection services)
-		{
-			services.NotNull(nameof(services));
+    public static class StashCacheExtensions
+    {
+        public static IServiceCollection AddStashCache(this IServiceCollection services)
+        {
+            services.NotNull(nameof(services));
 
-			services.AddMemoryCache();
+            services.AddMemoryCache();
 
-			services.AddSingleton<ILocalCache, LocalCache>();
+            services.AddSingleton<ILocalCache, LocalCache>();
 
-			return services;
-		}
-	}
+            return services;
+        }
+    }
 }

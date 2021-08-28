@@ -5,10 +5,10 @@ using System.Reflection;
 
 namespace StashCache
 {
-	public static class CacheKeyGeneratorFactory
+    public static class CacheKeyGeneratorFactory
     {
-        private static object _lock = new object();
-        private static readonly IEnumerable<Type> CacheGenerators = null;
+        private static readonly object _lock = new();
+        private static readonly IEnumerable<Type>? CacheGenerators = null;
 
         static CacheKeyGeneratorFactory()
         {
@@ -18,7 +18,10 @@ namespace StashCache
                 {
                     var types = Assembly.GetExecutingAssembly()
                         .GetTypes()
-                        .Where(t => t.GetInterfaces().Any(typeInterface => typeInterface.IsGenericType && typeInterface.GetGenericTypeDefinition() == typeof(ICacheKeyGenerator<>)));
+                        .Where(t => t.GetInterfaces()
+                            .Any(typeInterface => typeInterface.IsGenericType
+                                && typeInterface.GetGenericTypeDefinition() == typeof(ICacheKeyGenerator<>))
+                        );
 
                     CacheGenerators = types;
                 }
@@ -28,9 +31,15 @@ namespace StashCache
         public static ICacheKeyGenerator<TGenerator> GetCacheKeyGenerator<TGenerator>()
         {
             // TODO: add checking for multiple or no generator found.
-            var generator = CacheGenerators.FirstOrDefault(t => t.IsAssignableTo(typeof(ICacheKeyGenerator<TGenerator>)));
 
-            return Activator.CreateInstance(generator) as ICacheKeyGenerator<TGenerator>;
+            var generator = CacheGenerators!.FirstOrDefault(t => t.IsAssignableTo(typeof(ICacheKeyGenerator<TGenerator>)));
+
+            if (generator != null)
+            {
+                return (ICacheKeyGenerator<TGenerator>)Activator.CreateInstance(generator)!;
+            }
+
+            throw new ArgumentNullException($"Unable to find cache key generator for {typeof(TGenerator).Name}.");
         }
     }
 }

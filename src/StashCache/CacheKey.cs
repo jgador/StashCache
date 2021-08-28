@@ -10,45 +10,45 @@ namespace StashCache
         private const char Delimiter = ':';
         private readonly Type _ownerType;
         private readonly string _memberInfo;
-        private readonly IEnumerable<string> _segments;
-        private readonly string _segmentsString;
+        private readonly IEnumerable<string>? _segments;
+        private readonly string? _segmentString;
 
-        public CacheKey(Type ownerType, string memberInfo, IEnumerable<string> segments)
+        public CacheKey(Type ownerType, string memberInfo, IEnumerable<string>? segments)
         {
             _ownerType = ownerType.NotNull(nameof(ownerType));
             _memberInfo = memberInfo.NotEmpty(nameof(memberInfo));
             _segments = segments;
-            _segmentsString = null;
+            _segmentString = null;
 
-            if (_segments != null && _segments.Any())
+            if (segments != null && segments.Any())
             {
+                segments.ToList().ForEach(segment => segment.NotEmpty(nameof(segment)));
+
                 var sb = new StringBuilder();
-                foreach (var item in _segments)
+
+                foreach (var segment in segments)
                 {
-                    sb.Append($"{Delimiter}{item}");
+                    sb.Append($"{Delimiter}{segment}");
                 }
 
-                _segmentsString = sb.ToString();
+                _segmentString = sb.ToString();
             }
         }
 
-        public override bool Equals(object obj) => obj is CacheKey other && Equals(other);
+        public override bool Equals(object? obj) => obj is CacheKey other && Equals(other);
 
         public bool Equals(CacheKey other)
         {
             return _ownerType.FullName == other._ownerType.FullName
                 && _memberInfo == other._memberInfo
-                && _segmentsString == other._segmentsString;
+                && _segmentString == other._segmentString;
         }
 
-        public override int GetHashCode()
-        {
-            return base.GetHashCode();
-        }
+        public override int GetHashCode() => base.GetHashCode();
 
         public override string ToString()
         {
-            return $"{_ownerType.FullName}.{_memberInfo}{(_segmentsString ?? string.Empty)}";
+            return $"{_ownerType.FullName}.{_memberInfo}{_segmentString ?? string.Empty}";
         }
     }
 }
