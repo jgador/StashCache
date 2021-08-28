@@ -29,7 +29,7 @@ See example in `Sample.AspNetCore` project in this repo.
 
     private static readonly TimeSpan DefaultCacheExpiry = TimeSpan.FromHours(1);
 ```
-* Inject `ILocalCache` from classes which retrieves data
+* Inject `ILocalCache` to a class which retrieves data
 ```csharp
     private readonly ILocalCache _localCache;
     
@@ -44,12 +44,14 @@ See example in `Sample.AspNetCore` project in this repo.
     public async Task<IEnumerable<WeatherForecast>> GetAll(CancellationToken cancellationToken)
     {
         var cacheKey = CacheKeyGenerator.GenerateCacheKey<WeatherForecastService>();
-        var cachedValues = await _localCache.GetOrAddAsync(cacheKey, async () =>
+
+        var result = await _localCache.GetOrAddAsync(cacheKey, async () =>
         {
             var summaries = await GetSummariesAsyc(); // This can be your database call
             return summaries;
+
         }, DefaultCacheExpiry, cancellationToken).ConfigureAwait(false);
 
-        return cachedValues;
+        return result;
     }
 ```

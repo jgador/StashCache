@@ -22,7 +22,7 @@ namespace Sample.AspNetCore.Services
         {
             var cacheKey = CacheKeyGenerator.GenerateCacheKey<WeatherForecastService>();
 
-            var cachedValues = await _localCache.GetOrAddAsync(cacheKey, async () =>
+            var result = await _localCache.GetOrAddAsync(cacheKey, async () =>
             {
                 var summaries = await GetSummariesAsyc();
 
@@ -30,7 +30,7 @@ namespace Sample.AspNetCore.Services
 
             }, DefaultCacheExpiry, cancellationToken).ConfigureAwait(false);
 
-            return cachedValues;
+            return result;
         }
 
         public async Task<IEnumerable<WeatherForecast>> GetBySummaryAsync(string summary, CancellationToken cancellationToken)
