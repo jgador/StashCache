@@ -11,6 +11,7 @@ namespace StashCache
     public sealed class LocalCache : ILocalCache
     {
         private static readonly ConcurrentDictionary<CacheKey, object> _locks = new();
+        private ReaderWriterLockSlim _readerWriterLock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
         private readonly IMemoryCache _memoryCache;
         private readonly ILogger<LocalCache> _logger;
 
@@ -63,6 +64,50 @@ namespace StashCache
             finally
             {
                 _locks.TryRemove(cacheKey, out _);
+            }
+        }
+
+        public async Task<TResult> GetOrAddWithReaderWriterLockSlimAsync<TResult>(CacheKey cacheKey, Func<Task<TResult>> valueFactory, TimeSpan timeToLive, CancellationToken cancellationToken)
+        {
+            valueFactory.NotNull(nameof(valueFactory));
+
+            _readerWriterLock.EnterUpgradeableReadLock();
+
+            try
+            {
+                if (_memoryCache.TryGetValue(cacheKey, out TResult cachedValue))
+                {
+                    _logger.LogDebug($"Cache hit: {cacheKey}");
+
+                    return cachedValue;
+                }
+
+                _readerWriterLock.EnterWriteLock();
+
+                try
+                {
+                    _logger.LogDebug($"Cache miss: {cacheKey}");
+
+                    cachedValue = await valueFactory().ConfigureAwait(false);
+
+                    if (cachedValue == null)
+                    {
+                        throw new NotSupportedException("Does not support caching of null value.");
+                    }
+
+                    _memoryCache.Set(cacheKey, cachedValue, new MemoryCacheEntryOptions { AbsoluteExpirationRelativeToNow = timeToLive });
+
+                    return cachedValue;
+                }
+                finally
+                {
+                    _readerWriterLock.ExitWriteLock();
+                }
+
+            }
+            finally
+            {
+                _readerWriterLock.ExitUpgradeableReadLock();
             }
         }
     }

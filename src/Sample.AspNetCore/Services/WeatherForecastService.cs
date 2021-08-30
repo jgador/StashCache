@@ -22,7 +22,8 @@ namespace Sample.AspNetCore.Services
         {
             var cacheKey = CacheKeyGenerator.GenerateCacheKey<WeatherForecastService>();
 
-            var result = await _localCache.GetOrAddAsync(cacheKey, async () =>
+            // var result = await _localCache.GetOrAddAsync(cacheKey, async () =>
+            var result = await _localCache.GetOrAddWithReaderWriterLockSlimAsync(cacheKey, async () =>
             {
                 var summaries = await GetSummariesAsyc();
 
@@ -37,7 +38,8 @@ namespace Sample.AspNetCore.Services
         {
             var cacheKey = CacheKeyGenerator.GenerateCacheKey<WeatherForecastService>(segments: new string[] { summary });
 
-            var cachedValues = await _localCache.GetOrAddAsync(cacheKey, async () =>
+            // var cachedValues = await _localCache.GetOrAddAsync(cacheKey, async () =>
+            var cachedValues = await _localCache.GetOrAddWithReaderWriterLockSlimAsync(cacheKey, async () =>
             {
                 var result = (await GetSummariesAsyc())
                     .Where(a => a.Summary.ToLower() == summary.ToLower());

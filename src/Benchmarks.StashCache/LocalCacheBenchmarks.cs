@@ -40,13 +40,28 @@ namespace Benchmarks.StashCache
             LocalCache = localCache;
         }
 
-        [Benchmark(Baseline = true)]
+        [Benchmark]
         public async Task LocalCacheGetOrAddAsync()
         {
             CancellationTokenSource cts = new CancellationTokenSource();
             var cacheKey = CacheKeyGenerator.GenerateCacheKey<LocalCacheBenchmarks>();
 
             var result = await LocalCache.GetOrAddAsync(cacheKey, async () =>
+            {
+                var summaries = await GetSummariesAsyc();
+
+                return summaries;
+
+            }, DefaultCacheExpiry, cts.Token).ConfigureAwait(false);
+        }
+
+        [Benchmark]
+        public async Task LocalCacheGetOrAddWithReaderWriterLockSlimAsync()
+        {
+            CancellationTokenSource cts = new CancellationTokenSource();
+            var cacheKey = CacheKeyGenerator.GenerateCacheKey<LocalCacheBenchmarks>();
+
+            var result = await LocalCache.GetOrAddWithReaderWriterLockSlimAsync(cacheKey, async () =>
             {
                 var summaries = await GetSummariesAsyc();
 
