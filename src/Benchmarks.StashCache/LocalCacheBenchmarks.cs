@@ -16,8 +16,6 @@ namespace Benchmarks.StashCache
     [RankColumn]
     public class LocalCacheBenchmarks
     {
-        private static readonly IMemoryCache MemoryCache;
-        private static readonly ILogger<LocalCache> Logger;
         private static readonly ILocalCache LocalCache;
         private static readonly TimeSpan DefaultCacheExpiry = TimeSpan.FromHours(1);
         private static readonly ICacheKeyGenerator<TypeCacheKeyGenerator> CacheKeyGenerator = CacheKeyGeneratorFactory.GetCacheKeyGenerator<TypeCacheKeyGenerator>();
@@ -31,12 +29,8 @@ namespace Benchmarks.StashCache
 
             var serviceProvider = services.BuildServiceProvider();
 
-            var memoryCache = serviceProvider.GetRequiredService<IMemoryCache>();
-            var logger = serviceProvider.GetRequiredService<ILogger<LocalCache>>();
             var localCache = serviceProvider.GetRequiredService<ILocalCache>();
 
-            MemoryCache = memoryCache;
-            Logger = logger;
             LocalCache = localCache;
         }
 
