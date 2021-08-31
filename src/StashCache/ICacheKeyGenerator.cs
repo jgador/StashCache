@@ -5,6 +5,6 @@ namespace StashCache
 {
     public interface ICacheKeyGenerator<TGenerator>
     {
-        CacheKey GenerateCacheKey<TOwner>([CallerMemberName] string? callerMemberName = null, IEnumerable<string>? segments = null);
+        CacheKey GenerateCacheKey<TOwner>([CallerMemberName] string callerMemberName = null, string[] segments = null);
     }
 }

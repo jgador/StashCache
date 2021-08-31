@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyVersion>1.0.1</AssemblyVersion>
     <Version>1.0.1</Version>
     <Authors>Jesse Gador</Authors>
@@ -14,7 +14,7 @@
     <PackageTags>Cache;StashCache;MemoryCache</PackageTags>
     <NeutralLanguage>en</NeutralLanguage>
     <FileVersion>1.0.1</FileVersion>
-    <Nullable>enable</Nullable>
+    <!--<Nullable>enable</Nullable> for C# 8-->
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 

@@ -7,8 +7,8 @@ namespace StashCache
 {
     public static class CacheKeyGeneratorFactory
     {
-        private static readonly object _lock = new();
-        private static readonly IEnumerable<Type>? CacheGenerators = null;
+        private static readonly object _lock = new object();
+        private static readonly IEnumerable<Type> CacheGenerators = null;
 
         static CacheKeyGeneratorFactory()
         {
@@ -32,11 +32,11 @@ namespace StashCache
         {
             // TODO: add checking for multiple or no generator found.
 
-            var generator = CacheGenerators!.FirstOrDefault(t => t.IsAssignableTo(typeof(ICacheKeyGenerator<TGenerator>)));
+            var generator = CacheGenerators.FirstOrDefault(t => typeof(ICacheKeyGenerator<TGenerator>).IsAssignableFrom(t));
 
             if (generator != null)
             {
-                return (ICacheKeyGenerator<TGenerator>)Activator.CreateInstance(generator)!;
+                return (ICacheKeyGenerator<TGenerator>)Activator.CreateInstance(generator);
             }
 
             throw new ArgumentNullException($"Unable to find cache key generator for {typeof(TGenerator).Name}.");

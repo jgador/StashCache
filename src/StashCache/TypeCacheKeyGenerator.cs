@@ -5,11 +5,9 @@ namespace StashCache
 {
     public class TypeCacheKeyGenerator : ICacheKeyGenerator<TypeCacheKeyGenerator>
     {
-        public CacheKey GenerateCacheKey<TOwner>([CallerMemberName] string? callerMemberName = null, IEnumerable<string>? segments = null)
+        public CacheKey GenerateCacheKey<TOwner>([CallerMemberName] string callerMemberName = null, string[] segments = null)
         {
-#pragma warning disable CS8604 // Possible null reference argument.
-            return new(typeof(TOwner), callerMemberName, segments);
-#pragma warning restore CS8604 // Possible null reference argument.
+            return new CacheKey(typeof(TOwner), callerMemberName, segments);
         }
     }
 }

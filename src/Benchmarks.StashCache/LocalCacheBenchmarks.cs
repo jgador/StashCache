@@ -92,7 +92,7 @@ namespace Benchmarks.StashCache
         {
             for (int i = 1; i <= records; i++)
             {
-                var cacheKey = CacheKeyGenerator.GenerateCacheKey<LocalCacheBenchmarks>(segments: new List<string> { i.ToString() });
+                var cacheKey = CacheKeyGenerator.GenerateCacheKey<LocalCacheBenchmarks>(segments: new string[1] { i.ToString() });
 
                 var result = await LocalCache.GetOrAddAsync(cacheKey, async () =>
                 {
@@ -110,7 +110,7 @@ namespace Benchmarks.StashCache
         {
             for (int i = 1; i <= records; i++)
             {
-                var cacheKey = CacheKeyGenerator.GenerateCacheKey<LocalCacheBenchmarks>(segments: new List<string> { i.ToString() });
+                var cacheKey = CacheKeyGenerator.GenerateCacheKey<LocalCacheBenchmarks>(segments: new string[1] { i.ToString() });
 
                 var result = await LocalCache.GetOrAddWithReaderWriterLockSlimAsync(cacheKey, async () =>
                 {
