@@ -26,6 +26,8 @@ namespace StashCache
             {
                 result = await valueFactory().ConfigureAwait(false);
 
+                _memoryCache.Set(cacheKey, result, new MemoryCacheEntryOptions { AbsoluteExpirationRelativeToNow = timeToLive });
+
                 _logger.LogDebug($"Cache miss: {cacheKey}");
             }
 
