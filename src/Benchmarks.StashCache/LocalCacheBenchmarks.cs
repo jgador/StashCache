@@ -11,159 +11,127 @@ using System.Threading.Tasks;
 
 namespace Benchmarks.StashCache
 {
-    [MemoryDiagnoser]
-    [Orderer(SummaryOrderPolicy.FastestToSlowest)]
-    [RankColumn]
-    public class LocalCacheBenchmarks
-    {
-        private static readonly ILocalCache LocalCache;
-        private static readonly TimeSpan DefaultCacheExpiry = TimeSpan.FromHours(1);
-        private static readonly ICacheKeyGenerator<TypeCacheKeyGenerator> CacheKeyGenerator = CacheKeyGeneratorFactory.GetCacheKeyGenerator<TypeCacheKeyGenerator>();
+	[MemoryDiagnoser]
+	[Orderer(SummaryOrderPolicy.FastestToSlowest)]
+	[RankColumn]
+	public class LocalCacheBenchmarks
+	{
+		private static readonly ILocalCache LocalCache;
+		private static readonly TimeSpan DefaultCacheExpiry = TimeSpan.FromHours(1);
+		private static readonly ICacheKeyGenerator<TypeCacheKeyGenerator> CacheKeyGenerator = CacheKeyGeneratorFactory.GetCacheKeyGenerator<TypeCacheKeyGenerator>();
 
-        static LocalCacheBenchmarks()
-        {
-            var services = new ServiceCollection();
+		static LocalCacheBenchmarks()
+		{
+			var services = new ServiceCollection();
 
-            services.AddLogging(configure => configure.AddConsole());
-            services.AddStashCache();
+			services.AddLogging(configure => configure.AddConsole());
+			services.AddStashCache();
 
-            var serviceProvider = services.BuildServiceProvider();
+			var serviceProvider = services.BuildServiceProvider();
 
-            var localCache = serviceProvider.GetRequiredService<ILocalCache>();
+			var localCache = serviceProvider.GetRequiredService<ILocalCache>();
 
-            LocalCache = localCache;
-        }
+			LocalCache = localCache;
+		}
 
-        [Benchmark]
-        public async Task LocalCacheGetOrAddAsync()
-        {
-            CancellationTokenSource cts = new CancellationTokenSource();
-            var cacheKey = CacheKeyGenerator.GenerateCacheKey<LocalCacheBenchmarks>();
+		[Benchmark]
+		[Arguments(50, 100)]
+		[Arguments(100, 100)]
+		[Arguments(500, 100)]
+		[Arguments(1000, 100)]
+		// [Arguments(2000, 100)]
+		// [Arguments(5000, 100)]
+		// [Arguments(10000, 100)]
+		public async Task GetOrAddAsync(int cacheItemsCount, int retrieveCount)
+		{
+			using (var cts = new CancellationTokenSource())
+			{
+				while (retrieveCount-- > 0)
+				{
+					await AddOrRetrieveFromCacheAsync(cacheItemsCount, cts.Token).ConfigureAwait(false);
+				}
+			}
+		}
 
-            var result = await LocalCache.GetOrAddAsync(cacheKey, async () =>
-            {
-                var summaries = await GetSummariesAsyc();
+		[Benchmark]
+		[Arguments(50, 100)]
+		[Arguments(100, 100)]
+		[Arguments(500, 100)]
+		[Arguments(1000, 100)]
+		// [Arguments(2000, 100)]
+		// [Arguments(5000, 100)]
+		// [Arguments(10000, 100)]
+		public async Task GetOrAddWithReaderWriterLockSlimAsync(int cacheItemsCount, int retrieveCount)
+		{
+			using (var cts = new CancellationTokenSource())
+			{
+				while (retrieveCount-- > 0)
+				{
+					await AddOrRetrieveFromCacheReaderWriterLockSlimAsync(cacheItemsCount, cts.Token).ConfigureAwait(false);
+				}
+			}
+		}
 
-                return summaries;
+		private async Task AddOrRetrieveFromCacheAsync(int records, CancellationToken cancellationToken)
+		{
+			for (int i = 1; i <= records; i++)
+			{
+				var cacheKey = CacheKeyGenerator.GenerateCacheKey<LocalCacheBenchmarks>(segments: new string[1] { i.ToString() });
 
-            }, DefaultCacheExpiry, cts.Token).ConfigureAwait(false);
-        }
+				var result = await LocalCache.GetOrAddAsync(cacheKey, async () =>
+				{
+					var summaries = await GetSummariesAsyc();
 
-        [Benchmark]
-        public async Task LocalCacheGetOrAdd_1k_Async()
-        {
-            CancellationTokenSource cts = new CancellationTokenSource();
+					return summaries;
 
-            // Add 10k records to cache
-            await AddOrRetrieveFromCacheAsync(1000, cts.Token).ConfigureAwait(false);
+				}, DefaultCacheExpiry, cancellationToken).ConfigureAwait(false);
 
-            // Retrieve 10k stored records in cache
-            await AddOrRetrieveFromCacheAsync(1000, cts.Token).ConfigureAwait(false);
-        }
+				// Debug.Assert(result != null);
+			}
+		}
 
-        [Benchmark]
-        public async Task LocalCacheGetOrAddWithReaderWriterLockSlimAsync()
-        {
-            CancellationTokenSource cts = new CancellationTokenSource();
-            var cacheKey = CacheKeyGenerator.GenerateCacheKey<LocalCacheBenchmarks>();
+		private async Task AddOrRetrieveFromCacheReaderWriterLockSlimAsync(int records, CancellationToken cancellationToken)
+		{
+			for (int i = 1; i <= records; i++)
+			{
+				var cacheKey = CacheKeyGenerator.GenerateCacheKey<LocalCacheBenchmarks>(segments: new string[1] { i.ToString() });
 
-            var result = await LocalCache.GetOrAddWithReaderWriterLockSlimAsync(cacheKey, async () =>
-            {
-                var summaries = await GetSummariesAsyc();
+				var result = await LocalCache.GetOrAddWithReaderWriterLockSlimAsync(cacheKey, async () =>
+				{
+					var summaries = await GetSummariesAsyc();
 
-                return summaries;
+					return summaries;
 
-            }, DefaultCacheExpiry, cts.Token).ConfigureAwait(false);
-        }
+				}, DefaultCacheExpiry, cancellationToken).ConfigureAwait(false);
 
-        [Benchmark]
-        public async Task LocalCacheGetOrAdd_1k_WithReaderWriterLockSlimAsync()
-        {
-            CancellationTokenSource cts = new CancellationTokenSource();
+				Debug.Assert(result != null);
+			}
+		}
 
-            // Add 10k records to cache
-            await AddOrRetrieveFromCacheReaderWriterLockSlimAsync(1000, cts.Token).ConfigureAwait(false);
+		private async Task<IEnumerable<WeatherForecast>> GetSummariesAsyc()
+		{
+			await Task.CompletedTask;
 
-            // Retrieve 10k stored records in cache
-            await AddOrRetrieveFromCacheReaderWriterLockSlimAsync(1000, cts.Token).ConfigureAwait(false);
-        }
+			return new List<WeatherForecast>()
+			{
+				new WeatherForecast { Summary = "Freezing", TemperatureC = 1 },
+				new WeatherForecast { Summary = "Bracing", TemperatureC = 2 },
+				new WeatherForecast { Summary = "Chilly", TemperatureC = 3 },
+				new WeatherForecast { Summary = "Cool", TemperatureC = 4 },
+				new WeatherForecast { Summary = "Mild", TemperatureC = 5 },
+				new WeatherForecast { Summary = "Warm", TemperatureC = 6 },
+				new WeatherForecast { Summary = "Balmy", TemperatureC = 7 },
+				new WeatherForecast { Summary = "Hot", TemperatureC = 8 },
+				new WeatherForecast { Summary = "Sweltering", TemperatureC = 9 },
+				new WeatherForecast { Summary = "Scorching", TemperatureC = 10 }
+			}.ToArray();
+		}
 
-        private async Task AddOrRetrieveFromCacheAsync(int records, CancellationToken cancellationToken)
-        {
-            for (int i = 1; i <= records; i++)
-            {
-                var cacheKey = CacheKeyGenerator.GenerateCacheKey<LocalCacheBenchmarks>(segments: new string[1] { i.ToString() });
-
-                var result = await LocalCache.GetOrAddAsync(cacheKey, async () =>
-                {
-                    var summaries = await GetSummariesAsyc();
-
-                    return summaries;
-
-                }, DefaultCacheExpiry, cancellationToken).ConfigureAwait(false);
-
-                Debug.Assert(result != null);
-            }
-        }
-
-        private async Task AddOrRetrieveFromCacheReaderWriterLockSlimAsync(int records, CancellationToken cancellationToken)
-        {
-            for (int i = 1; i <= records; i++)
-            {
-                var cacheKey = CacheKeyGenerator.GenerateCacheKey<LocalCacheBenchmarks>(segments: new string[1] { i.ToString() });
-
-                var result = await LocalCache.GetOrAddWithReaderWriterLockSlimAsync(cacheKey, async () =>
-                {
-                    var summaries = await GetSummariesAsyc();
-
-                    return summaries;
-
-                }, DefaultCacheExpiry, cancellationToken).ConfigureAwait(false);
-
-                Debug.Assert(result != null);
-            }
-        }
-
-        private async Task<IEnumerable<WeatherForecast>> GetSummariesAsyc()
-        {
-            await Task.CompletedTask;
-
-            //var random = new Random();
-
-            //return new List<WeatherForecast>()
-            //{
-            //    new WeatherForecast { Summary = "Freezing", TemperatureC = random.Next(-20, 55) },
-            //    new WeatherForecast { Summary = "Bracing", TemperatureC = random.Next(-20, 55) },
-            //    new WeatherForecast { Summary = "Chilly", TemperatureC = random.Next(-20, 55) },
-            //    new WeatherForecast { Summary = "Cool", TemperatureC = random.Next(-20, 55) },
-            //    new WeatherForecast { Summary = "Mild", TemperatureC = random.Next(-20, 55) },
-            //    new WeatherForecast { Summary = "Warm", TemperatureC = random.Next(-20, 55) },
-            //    new WeatherForecast { Summary = "Balmy", TemperatureC = random.Next(-20, 55) },
-            //    new WeatherForecast { Summary = "Hot", TemperatureC = random.Next(-20, 55) },
-            //    new WeatherForecast { Summary = "Sweltering", TemperatureC = random.Next(-20, 55) },
-            //    new WeatherForecast { Summary = "Scorching", TemperatureC = random.Next(-20, 55) }
-            //}.ToArray();
-
-            return new List<WeatherForecast>()
-            {
-                new WeatherForecast { Summary = "Freezing", TemperatureC = 1 },
-                new WeatherForecast { Summary = "Bracing", TemperatureC = 2 },
-                new WeatherForecast { Summary = "Chilly", TemperatureC = 3 },
-                new WeatherForecast { Summary = "Cool", TemperatureC = 4 },
-                new WeatherForecast { Summary = "Mild", TemperatureC = 5 },
-                new WeatherForecast { Summary = "Warm", TemperatureC = 6 },
-                new WeatherForecast { Summary = "Balmy", TemperatureC = 7 },
-                new WeatherForecast { Summary = "Hot", TemperatureC = 8 },
-                new WeatherForecast { Summary = "Sweltering", TemperatureC = 9 },
-                new WeatherForecast { Summary = "Scorching", TemperatureC = 10 }
-            }.ToArray();
-        }
-
-        private class WeatherForecast
-        {
-            public int TemperatureC { get; set; }
-            public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-            public string Summary { get; set; }
-        }
-    }
+		private class WeatherForecast
+		{
+			public int TemperatureC { get; set; }
+			public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+			public string Summary { get; set; }
+		}
+	}
 }

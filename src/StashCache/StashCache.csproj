@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <AssemblyVersion>1.0.1</AssemblyVersion>
-    <Version>1.0.1</Version>
+    <AssemblyVersion>1.0.2</AssemblyVersion>
+    <Version>1.0.2</Version>
     <Authors>Jesse Gador</Authors>
     <Company>Jesse Gador</Company>
     <Description>In-memory cache wrapper implementation of Microsoft.Extensions.Caching.Memory.IMemoryCache.</Description>
@@ -13,7 +13,7 @@
     <RepositoryType>git</RepositoryType>
     <PackageTags>Cache;StashCache;MemoryCache</PackageTags>
     <NeutralLanguage>en</NeutralLanguage>
-    <FileVersion>1.0.1</FileVersion>
+    <FileVersion>1.0.2</FileVersion>
     <!--<Nullable>enable</Nullable> for C# 8-->
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
