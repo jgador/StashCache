@@ -21,8 +21,9 @@ namespace Sample.AspNetCore.Services
         public async Task<IEnumerable<WeatherForecast>> GetAll(CancellationToken cancellationToken)
         {
             var cacheKey = CacheKeyGenerator.GenerateCacheKey<WeatherForecastService>();
+            var hashCode = cacheKey.GetHashCode();
 
-            var result = await _localCache.GetOrAddAsync(cacheKey, async () =>
+            var result = await _localCache.GetOrCreateAsync(cacheKey, async () =>
             // var result = await _localCache.GetOrAddWithReaderWriterLockSlimAsync(cacheKey, async () =>
             {
                 var summaries = await GetSummariesAsyc();
@@ -37,8 +38,9 @@ namespace Sample.AspNetCore.Services
         public async Task<IEnumerable<WeatherForecast>> GetBySummaryAsync(string summary, CancellationToken cancellationToken)
         {
             var cacheKey = CacheKeyGenerator.GenerateCacheKey<WeatherForecastService>(segments: new string[] { summary, null });
+            var hashCode = cacheKey.GetHashCode();
 
-            var cachedValues = await _localCache.GetOrAddAsync(cacheKey, async () =>
+            var cachedValues = await _localCache.GetOrCreateAsync(cacheKey, async () =>
             // var cachedValues = await _localCache.GetOrAddWithReaderWriterLockSlimAsync(cacheKey, async () =>
             {
                 var result = (await GetSummariesAsyc())

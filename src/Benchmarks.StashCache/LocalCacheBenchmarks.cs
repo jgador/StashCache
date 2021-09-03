@@ -5,7 +5,6 @@ using Microsoft.Extensions.Logging;
 using StashCache;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -35,14 +34,14 @@ namespace Benchmarks.StashCache
 		}
 
 		[Benchmark]
-		[Arguments(50, 100)]
-		[Arguments(100, 100)]
-		[Arguments(500, 100)]
-		[Arguments(1000, 100)]
-		// [Arguments(2000, 100)]
-		// [Arguments(5000, 100)]
-		// [Arguments(10000, 100)]
-		public async Task GetOrAddAsync(int cacheItemsCount, int retrieveCount)
+        [Arguments(50, 1000)]
+        [Arguments(100, 1000)]
+        [Arguments(500, 1000)]
+        [Arguments(1000, 1000)]
+        [Arguments(2000, 2000)]
+        // [Arguments(5000, 2000)]
+        // [Arguments(10000, 2000)]
+        public async Task GetOrAddAsync(int cacheItemsCount, int retrieveCount)
 		{
 			using (var cts = new CancellationTokenSource())
 			{
@@ -53,32 +52,13 @@ namespace Benchmarks.StashCache
 			}
 		}
 
-		[Benchmark]
-		[Arguments(50, 100)]
-		[Arguments(100, 100)]
-		[Arguments(500, 100)]
-		[Arguments(1000, 100)]
-		// [Arguments(2000, 100)]
-		// [Arguments(5000, 100)]
-		// [Arguments(10000, 100)]
-		public async Task GetOrAddWithReaderWriterLockSlimAsync(int cacheItemsCount, int retrieveCount)
-		{
-			using (var cts = new CancellationTokenSource())
-			{
-				while (retrieveCount-- > 0)
-				{
-					await AddOrRetrieveFromCacheReaderWriterLockSlimAsync(cacheItemsCount, cts.Token).ConfigureAwait(false);
-				}
-			}
-		}
-
 		private async Task AddOrRetrieveFromCacheAsync(int records, CancellationToken cancellationToken)
 		{
 			for (int i = 1; i <= records; i++)
 			{
 				var cacheKey = CacheKeyGenerator.GenerateCacheKey<LocalCacheBenchmarks>(segments: new string[1] { i.ToString() });
 
-				var result = await LocalCache.GetOrAddAsync(cacheKey, async () =>
+				var result = await LocalCache.GetOrCreateAsync(cacheKey, async () =>
 				{
 					var summaries = await GetSummariesAsyc();
 
@@ -87,24 +67,6 @@ namespace Benchmarks.StashCache
 				}, DefaultCacheExpiry, cancellationToken).ConfigureAwait(false);
 
 				// Debug.Assert(result != null);
-			}
-		}
-
-		private async Task AddOrRetrieveFromCacheReaderWriterLockSlimAsync(int records, CancellationToken cancellationToken)
-		{
-			for (int i = 1; i <= records; i++)
-			{
-				var cacheKey = CacheKeyGenerator.GenerateCacheKey<LocalCacheBenchmarks>(segments: new string[1] { i.ToString() });
-
-				var result = await LocalCache.GetOrAddWithReaderWriterLockSlimAsync(cacheKey, async () =>
-				{
-					var summaries = await GetSummariesAsyc();
-
-					return summaries;
-
-				}, DefaultCacheExpiry, cancellationToken).ConfigureAwait(false);
-
-				Debug.Assert(result != null);
 			}
 		}
 
