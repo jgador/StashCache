@@ -55,3 +55,14 @@ See example in `Sample.AspNetCore` project in this repo.
         return result;
     }
 ```
+
+## Benchmark using [BenchmarkDotNet](https://github.com/dotnet/BenchmarkDotNet)
+
+|        Method | # of Cached Items | Total # of retrievals |  Mean (μs) | StdDev (μs) | Allocated (KB) |
+|-------------- |:----------------- |:----------------------|:-----------|:------------|:---------------|
+| GetOrAddAsync |               100 |                     1 |      61.05 |       2.416 |             57 |
+| GetOrAddAsync |               100 |                    10 |     609.78 |       5.298 |            568 |
+| GetOrAddAsync |               100 |                   100 |   5,829.17 |     121.375 |          5,675 |
+| GetOrAddAsync |               100 |                   500 |  29,906.00 |     201.832 |         28,376 |
+| GetOrAddAsync |               500 |                   500 | 156,081.09 |   2,215.348 |        142,444 |
+| GetOrAddAsync |              1000 |                   500 | 306,005.04 |   2,911.767 |        285,028 |

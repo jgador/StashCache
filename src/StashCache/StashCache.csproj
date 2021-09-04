@@ -1,24 +1,24 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
-    <AssemblyVersion>1.0.1</AssemblyVersion>
-    <Version>1.0.1</Version>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyVersion>1.0.2</AssemblyVersion>
+    <Version>1.0.2</Version>
     <Authors>Jesse Gador</Authors>
     <Company>Jesse Gador</Company>
-    <Description>In-memory cache wrapper implementation of Microsoft.Extensions.Caching.Memory.IMemoryCache.</Description>
+    <Description>In-memory cache wrapper implementation of Microsoft.Extensions.Caching.Memory.MemoryCache.</Description>
     <Copyright>MIT</Copyright>
     <PackageProjectUrl>https://github.com/jgador/StashCache</PackageProjectUrl>
     <RepositoryUrl>https://github.com/jgador/StashCache</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>Cache;StashCache;MemoryCache</PackageTags>
     <NeutralLanguage>en</NeutralLanguage>
-    <FileVersion>1.0.1</FileVersion>
-    <Nullable>enable</Nullable>
+    <FileVersion>1.0.2</FileVersion>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1" />
     <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.0" />

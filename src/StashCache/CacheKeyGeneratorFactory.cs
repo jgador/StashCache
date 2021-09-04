@@ -7,8 +7,8 @@ namespace StashCache
 {
     public static class CacheKeyGeneratorFactory
     {
-        private static readonly object _lock = new();
-        private static readonly IEnumerable<Type>? CacheGenerators = null;
+        private static readonly object _lock = new object();
+        private static readonly IEnumerable<Type> CacheGenerators = null;
 
         static CacheKeyGeneratorFactory()
         {
@@ -28,18 +28,28 @@ namespace StashCache
             }
         }
 
+        /// <summary>
+        /// Gets the cache key generator instance for <typeparamref name="TGenerator"/>.
+        /// </summary>
+        /// <typeparam name="TGenerator">The type of cache key genrator.</typeparam>
+        /// <returns>The cache key generator.</returns>
         public static ICacheKeyGenerator<TGenerator> GetCacheKeyGenerator<TGenerator>()
         {
-            // TODO: add checking for multiple or no generator found.
-
-            var generator = CacheGenerators!.FirstOrDefault(t => t.IsAssignableTo(typeof(ICacheKeyGenerator<TGenerator>)));
-
-            if (generator != null)
+            try
             {
-                return (ICacheKeyGenerator<TGenerator>)Activator.CreateInstance(generator)!;
-            }
+                var generator = CacheGenerators.SingleOrDefault(t => typeof(ICacheKeyGenerator<TGenerator>).IsAssignableFrom(t));
 
-            throw new ArgumentNullException($"Unable to find cache key generator for {typeof(TGenerator).Name}.");
+                if (generator != null)
+                {
+                    return (ICacheKeyGenerator<TGenerator>)Activator.CreateInstance(generator);
+                }
+
+                throw new ArgumentException($"No cache key generator found for type {typeof(TGenerator).FullName}", nameof(TGenerator));
+            }
+            catch (Exception ex)
+            {
+                throw new ArgumentException($"Found multiple cache key generators for type {typeof(TGenerator).FullName}.", nameof(TGenerator), ex);
+            }
         }
     }
 }

@@ -1,19 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace StashCache
 {
+    /// <summary>
+    /// A case-sensitive key that uniquely identifies a local in-memory cache value.
+    /// </summary>
+    [DebuggerDisplay("{ToString()}")]
     public readonly struct CacheKey : IEquatable<CacheKey>
     {
         private const char Delimiter = ':';
         private readonly Type _ownerType;
         private readonly string _memberInfo;
-        private readonly IEnumerable<string>? _segments;
-        private readonly string? _segmentString;
+        private readonly IEnumerable<string> _segments;
+        private readonly string _segmentString;
 
-        public CacheKey(Type ownerType, string memberInfo, IEnumerable<string>? segments)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CacheKey"/>.
+        /// </summary>
+        /// <param name="ownerType">The class from which the cache key is generated.</param>
+        /// <param name="memberInfo">The name of the method in <paramref name="ownerType"/> that needs caching.
+        ///     Method name is determined from <see cref="CallerMemberNameAttribute"/>.
+        /// </param>
+        /// <param name="segments">The optional collection of segments that will be appended to the key.</param>
+        public CacheKey(Type ownerType, string memberInfo, IEnumerable<string> segments)
         {
             _ownerType = ownerType.NotNull(nameof(ownerType));
             _memberInfo = memberInfo.NotEmpty(nameof(memberInfo));
@@ -22,11 +36,9 @@ namespace StashCache
 
             if (segments != null && segments.Any())
             {
-                segments.ToList().ForEach(segment => segment.NotEmpty(nameof(segment)));
-
                 var sb = new StringBuilder();
 
-                foreach (var segment in segments)
+                foreach (var segment in segments.Where(s => !string.IsNullOrWhiteSpace(s)))
                 {
                     sb.Append($"{Delimiter}{segment}");
                 }
@@ -35,16 +47,24 @@ namespace StashCache
             }
         }
 
-        public override bool Equals(object? obj) => obj is CacheKey other && Equals(other);
+        public override bool Equals(object obj) => obj is CacheKey other && Equals(other);
 
         public bool Equals(CacheKey other)
         {
-            return _ownerType.FullName == other._ownerType.FullName
+            return _ownerType.Equals(other._ownerType)
                 && _memberInfo == other._memberInfo
                 && _segmentString == other._segmentString;
         }
 
-        public override int GetHashCode() => base.GetHashCode();
+        public override int GetHashCode()
+        {
+            var hash = new HashCode();
+            hash.Add(_ownerType.FullName);
+            hash.Add(_memberInfo);
+            hash.Add(_segmentString);
+
+            return hash.ToHashCode();
+        }
 
         public override string ToString()
         {

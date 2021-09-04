@@ -21,8 +21,9 @@ namespace Sample.AspNetCore.Services
         public async Task<IEnumerable<WeatherForecast>> GetAll(CancellationToken cancellationToken)
         {
             var cacheKey = CacheKeyGenerator.GenerateCacheKey<WeatherForecastService>();
+            var hashCode = cacheKey.GetHashCode();
 
-            var result = await _localCache.GetOrAddAsync(cacheKey, async () =>
+            var result = await _localCache.GetOrCreateAsync(cacheKey, async () =>
             {
                 var summaries = await GetSummariesAsyc();
 
@@ -35,9 +36,10 @@ namespace Sample.AspNetCore.Services
 
         public async Task<IEnumerable<WeatherForecast>> GetBySummaryAsync(string summary, CancellationToken cancellationToken)
         {
-            var cacheKey = CacheKeyGenerator.GenerateCacheKey<WeatherForecastService>(segments: new string[] { summary });
+            var cacheKey = CacheKeyGenerator.GenerateCacheKey<WeatherForecastService>(segments: new string[] { summary.ToLower(), null });
+            var hashCode = cacheKey.GetHashCode();
 
-            var cachedValues = await _localCache.GetOrAddAsync(cacheKey, async () =>
+            var cachedValues = await _localCache.GetOrCreateAsync(cacheKey, async () =>
             {
                 var result = (await GetSummariesAsyc())
                     .Where(a => a.Summary.ToLower() == summary.ToLower());
@@ -45,7 +47,6 @@ namespace Sample.AspNetCore.Services
                 return result;
 
             }, DefaultCacheExpiry, cancellationToken).ConfigureAwait(false);
-
 
             return cachedValues;
         }
