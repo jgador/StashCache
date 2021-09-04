@@ -34,13 +34,12 @@ namespace Benchmarks.StashCache
 		}
 
 		[Benchmark]
-        [Arguments(50, 1000)]
-        [Arguments(100, 1000)]
-        [Arguments(500, 1000)]
-        [Arguments(1000, 1000)]
-        [Arguments(2000, 2000)]
-        // [Arguments(5000, 2000)]
-        // [Arguments(10000, 2000)]
+		[Arguments(100, 1)]
+		[Arguments(100, 10)]
+		[Arguments(100, 100)]
+		[Arguments(100, 500)]
+		[Arguments(500, 500)]
+        [Arguments(1000, 500)]
         public async Task GetOrAddAsync(int cacheItemsCount, int retrieveCount)
 		{
 			using (var cts = new CancellationTokenSource())
@@ -65,8 +64,6 @@ namespace Benchmarks.StashCache
 					return summaries;
 
 				}, DefaultCacheExpiry, cancellationToken).ConfigureAwait(false);
-
-				// Debug.Assert(result != null);
 			}
 		}
 
