@@ -58,11 +58,11 @@ See example in `Sample.AspNetCore` project in this repo.
 
 ## Benchmark using [BenchmarkDotNet](https://github.com/dotnet/BenchmarkDotNet)
 
-|        Method | # of Cached Items | Total # of retrievals |          Mean |       StdDev |      Gen 0 |  Allocated |
-|-------------- |:----------------- |:----------------------|:--------------|:-------------|:-----------|:-----------|
-| GetOrAddAsync |               100 |                     1 |      61.05 μs |     2.416 μs |     9.1553 |      57 KB |
-| GetOrAddAsync |               100 |                    10 |     609.78 μs |     5.298 μs |    91.7969 |     568 KB |
-| GetOrAddAsync |               100 |                   100 |   5,829.17 μs |   121.375 μs |   921.8750 |   5,675 KB |
-| GetOrAddAsync |               100 |                   500 |  29,906.00 μs |   201.832 μs |  4625.0000 |  28,376 KB |
-| GetOrAddAsync |               500 |                   500 | 156,081.09 μs | 2,215.348 μs | 23250.0000 | 142,444 KB |
-| GetOrAddAsync |              1000 |                   500 | 306,005.04 μs | 2,911.767 μs | 46000.0000 | 285,028 KB |
+|        Method | # of Cached Items | Total # of retrievals |  Mean (μs) | StdDev (μs) | Allocated (KB) |
+|-------------- |:----------------- |:----------------------|:-----------|:------------|:---------------|
+| GetOrAddAsync |               100 |                     1 |      61.05 |       2.416 |             57 |
+| GetOrAddAsync |               100 |                    10 |     609.78 |       5.298 |            568 |
+| GetOrAddAsync |               100 |                   100 |   5,829.17 |     121.375 |          5,675 |
+| GetOrAddAsync |               100 |                   500 |  29,906.00 |     201.832 |         28,376 |
+| GetOrAddAsync |               500 |                   500 | 156,081.09 |   2,215.348 |        142,444 |
+| GetOrAddAsync |              1000 |                   500 | 306,005.04 |   2,911.767 |        285,028 |
