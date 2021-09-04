@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\StashCache\StashCache.csproj" />
+    <ProjectReference Include="..\..\src\StashCache\StashCache.csproj" />
   </ItemGroup>
 
 </Project>

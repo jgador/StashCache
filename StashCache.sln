@@ -5,9 +5,9 @@ VisualStudioVersion = 17.0.31612.314
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StashCache", "src\StashCache\StashCache.csproj", "{3E9FAA63-9B8C-4467-8C4B-F41106A2B970}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sample.AspNetCore", "src\Sample.AspNetCore\Sample.AspNetCore.csproj", "{63B70F97-7359-45EB-BF1C-C96699E3D13C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sample.AspNetCore", "sample\Sample.AspNetCore\Sample.AspNetCore.csproj", "{63B70F97-7359-45EB-BF1C-C96699E3D13C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benchmarks.StashCache", "src\Benchmarks.StashCache\Benchmarks.StashCache.csproj", "{CF7AFFC5-1FA3-48B3-A745-11CB6AF38B60}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benchmarks.StashCache", "benchmark\Benchmarks.StashCache\Benchmarks.StashCache.csproj", "{CF7AFFC5-1FA3-48B3-A745-11CB6AF38B60}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{A403D491-05C8-419D-96E1-3C974FA953AF}"
 EndProject
